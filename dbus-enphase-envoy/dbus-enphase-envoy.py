@@ -72,6 +72,17 @@ if "DEFAULT" in config and "logging" in config["DEFAULT"]:
 else:
     logging.basicConfig(level=logging.WARNING)
 
+# get device_name
+if "DEFAULT" in config and "device_name" in config["DEFAULT"]:
+    device_name = config["DEFAULT"]["device_name"]
+else:
+    device_name = "Enphase PV"
+
+# get device_instance
+if "DEFAULT" in config and "device_instance" in config["DEFAULT"]:
+    device_instance = config["DEFAULT"]["device_instance"]
+else:
+    device_instance = 61
 
 # check if MQTT is enabled in config
 if "MQTT" in config and "enabled" in config["MQTT"] and config["MQTT"]["enabled"] == "1":
@@ -1379,7 +1390,7 @@ class DbusEnphaseEnvoyPvService:
         self._dbusservice.add_path("/ProductId", 0xFFFF)
         self._dbusservice.add_path("/ProductName", productname)
         self._dbusservice.add_path("/CustomName", productname)
-        self._dbusservice.add_path("/FirmwareVersion", "0.2.4-dev (20241008)")
+        self._dbusservice.add_path("/FirmwareVersion", "0.2.4-dev (20241030)")
         self._dbusservice.add_path("/HardwareVersion", hardware)
         self._dbusservice.add_path("/Connected", 1)
 
@@ -1752,8 +1763,9 @@ def main():
         )
 
     DbusEnphaseEnvoyPvService(
-        servicename="com.victronenergy.pvinverter.enphase_envoy",
-        deviceinstance=61,
+        servicename="com.victronenergy.pvinverter.enphase_envoy_" + str(device_instance),
+        productname=device_name,
+        deviceinstance=int(device_instance),
         paths=paths_dbus,
         hardware=hardware,
     )

@@ -1,6 +1,8 @@
 # Changelog
 
 ## v0.2.4-dev
+* Added: Make device instance configurable
+* Added: Make device name configurable
 * Changed: Broker port missing on reconnect
 * Changed: Fixed service not starting sometimes
 
