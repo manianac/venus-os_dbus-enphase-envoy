@@ -1,8 +1,10 @@
 # Changelog
 
-## v0.2.4-dev
+## v0.2.4
+⚠️ This version is required for Venus OS v3.60~27 or later, but it is also compatible with older versions.
 * Added: Make device instance configurable
 * Added: Make device name configurable
+* Added: paho-mqtt module to driver
 * Changed: Broker port missing on reconnect
 * Changed: Fixed service not starting sometimes
 
