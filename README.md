@@ -2,7 +2,22 @@
 
 <small>GitHub repository: [mr-manuel/venus-os_dbus-enphase-envoy](https://github.com/mr-manuel/venus-os_dbus-enphase-envoy)</small>
 
-### Disclaimer
+## Index
+
+1. [Disclaimer](#disclaimer)
+1. [Supporting/Sponsoring this project](#supportingsponsoring-this-project)
+1. [Purpose](#purpose)
+1. [Requirement](#requirement)
+1. [Config](#config)
+1. [JSON structure](#json-structure)
+1. [Install / Update](#install--update)
+1. [Uninstall](#uninstall)
+1. [Restart](#restart)
+1. [Debugging](#debugging)
+1. [Compatibility](#compatibility)
+1. [Screenshots](#screenshots)
+
+## Disclaimer
 
 I wrote this script for myself. I'm not responsible, if you damage something using my script.
 
@@ -20,7 +35,7 @@ Since `v0.2.0` this script works with the `D5.x.x` and `D7.x.x` firmware on the 
 
 The firmware `D7.x.x` has another authentication mechanism and needs a token for the local API access. This token is automatically requested and updated. To achieve this you need to enter your Enphase Enlighten credentials and the Envoy serial number in the `config.ini`.
 
-#### 💡 NOTE
+### 💡 NOTE
 
 Currently it works only for self-installers, since they are able to request a token that has the installer user. You can request a token over https://entrez.enphaseenergy.com/ -> Login -> For commissioned gateway -> Enter the name of your site (at least three letters to start the search), select the Gateway and then press create access token. Copy the token and paste it on https://www.jstoolset.com/jwt.
 
@@ -33,7 +48,7 @@ UPDATE (2023.06.06): The needed API `/stream/meter` will be available with the `
 
 🚨 UPDATE (2023.09.18): Enphase did nothing until now. Your help is requested! Please also comment under [Make "/stream/meter" available with "owner" token](https://support.enphase.com/s/question/0D53m00009CewmJCAR/make-streammeter-available-with-owner-token). Additionally contact the Enphase support, by linking to the article above, tell them that you need this function and ask when it will be released.
 
-### Purpose
+## Purpose
 
 This script adds the Enphase Microinverters as a single PV system in Venus OS. The data is fetched from the Enphase Envoy-S device and publishes on the dbus as the service `com.victronenergy.pvinverter.enphase_envoy` with the VRM instance `61`. The number of phases are automatically recognized, so it displays automatically the number of phases you are using (one, two or three).
 
@@ -53,18 +68,18 @@ If you also want to use the Enphase Envoy-S as grid meter in Venus OS, then inst
 
 Shoudn't you already have a MQTT broker, than you can enable the Venus OS integrated MQTT broker under Venus OS GUI -> Menu -> Services -> MQTT on LAN (SSL) and if desired MQTT on LAN (Plaintext). In the `config.ini` insert the IP address of the Venus OS device or `127.0.0.1`.
 
-#### ⚠️ Requirement
+## ⚠️ Requirement
 
 The driver only works, if there is at least the production CT (Current Transformer) installed. Best would be, if you have a consumption and production CT installed. In nearly all cases it's possible to retrofit them. You can purchase the needed CT's as a pair in the [Enphase Store](https://enphase.com/store/communication/consumption-ct) or wherever you like. Ask your installer, if you don't know how to retrofit it by yourself.
 
 ![CT wiring diagram](./screenshots/ct-wiring-diagram.png)
 
-### Config
+## Config
 
 Copy or rename the `config.sample.ini` to `config.ini` in the `dbus-enphase-envoy` folder and change it as you need it.
 
 
-### JSON structure
+## JSON structure
 
 <details><summary>PV, Grid, Consumption</summary>
 
@@ -364,63 +379,96 @@ Copy or rename the `config.sample.ini` to `config.ini` in the `dbus-enphase-envo
 </details>
 
 
-### Install
+## Install / Update
 
 1. Login to your Venus OS device via SSH. See [Venus OS:Root Access](https://www.victronenergy.com/live/ccgx:root_access#root_access) for more details.
 
-2. Execute this commands to download and extract the files:
+2. Execute this commands to download and copy the files:
 
     ```bash
-    # change to temp folder
-    cd /tmp
+    wget -O /tmp/download_dbus-enphase-envoy.sh https://raw.githubusercontent.com/mr-manuel/venus-os_dbus-enphase-envoy/master/download.sh
 
-    # download driver
-    wget -O /tmp/venus-os_dbus-enphase-envoy.zip https://github.com/mr-manuel/venus-os_dbus-enphase-envoy/archive/refs/heads/master.zip
-
-    # If updating: cleanup old folder
-    rm -rf /tmp/venus-os_dbus-enphase-envoy-master
-
-    # unzip folder
-    unzip venus-os_dbus-enphase-envoy.zip
-
-    # If updating: backup existing config file
-    mv /data/etc/dbus-enphase-envoy/config.ini /data/etc/dbus-enphase-envoy_config.ini
-
-    # If updating: cleanup existing driver
-    rm -rf /data/etc/dbus-enphase-envoy
-
-    # copy files
-    cp -R /tmp/venus-os_dbus-enphase-envoy-master/dbus-enphase-envoy/ /data/etc/
-
-    # If updating: restore existing config file
-    mv /data/etc/dbus-enphase-envoy_config.ini /data/etc/dbus-enphase-envoy/config.ini
+    bash /tmp/download_dbus-enphase-envoy.sh
     ```
 
-3. Copy the sample config file, if you are installing the driver for the first time and edit it to your needs.
+3. Select the version you want to install.
 
+4. Press enter for a single instance. For multiple instances, enter a number and press enter.
+
+    Example:
+
+    - Pressing enter or entering `1` will install the driver to `/data/etc/dbus-enphase-envoy`.
+    - Entering `2` will install the driver to `/data/etc/dbus-enphase-envoy-2`.
+
+### Extra steps for your first installation
+
+5. Edit the config file to fit your needs. The correct command for your installation is shown after the installation.
+
+    - If you pressed enter or entered `1` during installation:
     ```bash
-    # copy default config file
-    cp /data/etc/dbus-enphase-envoy/config.sample.ini /data/etc/dbus-enphase-envoy/config.ini
-
-    # edit the config file with nano
     nano /data/etc/dbus-enphase-envoy/config.ini
     ```
 
-4. Run `bash /data/etc/dbus-enphase-envoy/install.sh` to install the driver as service.
+    - If you entered `2` during installation:
+    ```bash
+    nano /data/etc/dbus-enphase-envoy-2/config.ini
+    ```
 
-   The daemon-tools should start this service automatically within seconds.
+6. Install the driver as a service. The correct command for your installation is shown after the installation.
 
-### Uninstall
+    - If you pressed enter or entered `1` during installation:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy/install.sh
+    ```
 
-Run `/data/etc/dbus-enphase-envoy/uninstall.sh`
+    - If you entered `2` during installation:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy-2/install.sh
+    ```
 
-### Restart
+    The daemon-tools should start this service automatically within seconds.
 
-Run `/data/etc/dbus-enphase-envoy/restart.sh`
+## Uninstall
 
-### Debugging
+⚠️ If you have multiple instances, ensure you choose the correct one. For example:
 
-The logs can be checked with `tail -n 100 -f /data/log/dbus-enphase-envoy/current | tai64nlocal`
+- To uninstall the default instance:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy/uninstall.sh
+    ```
+
+- To uninstall the second instance:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy-2/uninstall.sh
+    ```
+
+## Restart
+
+⚠️ If you have multiple instances, ensure you choose the correct one. For example:
+
+- To restart the default instance:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy/restart.sh
+    ```
+
+- To restart the second instance:
+    ```bash
+    bash /data/etc/dbus-enphase-envoy-2/restart.sh
+    ```
+
+## Debugging
+
+⚠️ If you have multiple instances, ensure you choose the correct one.
+
+- To check the logs of the default instance:
+    ```bash
+    tail -n 100 -F /data/log/dbus-enphase-envoy/current | tai64nlocal
+    ```
+
+- To check the logs of the second instance:
+    ```bash
+    tail -n 100 -F /data/log/dbus-enphase-envoy-2/current | tai64nlocal
+    ```
 
 The service status can be checked with svstat `svstat /service/dbus-enphase-envoy`
 
@@ -430,14 +478,11 @@ If the seconds are under 5 then the service crashes and gets restarted all the t
 
 If the script stops with the message `dbus.exceptions.NameExistsException: Bus name already exists: com.victronenergy.pvinverter.enphase_envoy"` it means that the service is still running or another service is using that bus name.
 
-### Compatibility
+## Compatibility
 
-It was tested on Venus OS Large `v2.92` on the following devices:
+This software supports the latest three stable versions of Venus OS. It may also work on older versions, but this is not guaranteed.
 
-* RaspberryPi 4b
-* MultiPlus II (GX Version)
-
-### Screenshots
+## Screenshots
 
 <details><summary>Power L1</summary>
 
