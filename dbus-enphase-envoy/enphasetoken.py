@@ -29,14 +29,16 @@ class getToken:
         else:
             json_data = {"auth_token": "", "created": 0}
 
-        # request a new token, if the old one is older than 12 hours
-        if json_data["created"] + (60 * 60 * 12) - (60 * 5) < time():
+        # request a new token, if the old one is older than appx. 11 months
+        if json_data["created"] + (60 * 60 * 24 * 30 * 11) - (60 * 5) < time():
             logging.warning(f"EnphaseToken: Token expired. Creation date: {datetime.fromtimestamp(json_data['created'])} UTC")
 
             try:
                 token = Authentication()
 
-                token.authenticate(self.user, self.password)
+                auth_ok = token.authenticate(self.user, self.password)
+                if not auth_ok:
+                    raise RuntimeError("EnphaseToken: Authentication failed")
 
                 response_data = token.get_token_for_commissioned_gateway(self.serial)
 
